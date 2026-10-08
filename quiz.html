@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Online Quiz</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .quiz-container {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    #question {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #222;
+    }
+
+    .option {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      text-align: left;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .option:hover {
+      background: #f0f0ff;
+      border-color: #667eea;
+    }
+
+    .option.correct {
+      background: #c8f7c5;
+      border-color: green;
+    }
+
+    .option.wrong {
+      background: #ffc8c8;
+      border-color: red;
+    }
+
+    #nextBtn,
+    #restartBtn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #667eea;
+      color: white;
+      font-size: 17px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    #nextBtn:hover,
+    #restartBtn:hover {
+      background: #5568d8;
+    }
+
+    #score {
+      text-align: center;
+      font-size: 25px;
+      font-weight: bold;
+      margin: 20px 0;
+      color: #333;
+    }
+
+    #progress {
+      text-align: right;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="quiz-container">
+
+    <h1>Online Quiz</h1>
+
+    <div id="quizBox">
+
+      <div id="progress"></div>
+
+      <div id="question"></div>
+
+      <div id="options"></div>
+
+      <button id="nextBtn" class="hidden">Next Question</button>
+
+    </div>
+
+    <div id="resultBox" class="hidden">
+      <h1>Quiz Completed 🎉</h1>
+
+      <div id="score"></div>
+
+      <button id="restartBtn">Restart Quiz</button>
+    </div>
+
+  </div>
+
+
+  <script>
+
+    const questions = [
+      {
+        question: "What is the full form of HTML?",
+        options: [
+          "Hyper Text Markup Language",
+          "High Text Machine Language",
+          "Hyperlink Text Markup Language",
+          "Home Tool Markup Language"
+        ],
+        answer: 0
+      },
+
+      {
+        question: "Which language is used for styling web pages?",
+        options: [
+          "HTML",
+          "CSS",
+          "JavaScript",
+          "Python"
+        ],
+        answer: 1
+      },
+
+      {
+        question: "Which language is used to make a website interactive?",
+        options: [
+          "CSS",
+          "HTML",
+          "JavaScript",
+          "SQL"
+        ],
+        answer: 2
+      },
+
+      {
+        question: "Which tag is used to create a paragraph in HTML?",
+        options: [
+          "<h1>",
+          "<p>",
+          "<br>",
+          "<div>"
+        ],
+        answer: 1
+      },
+
+      {
+        question: "Which symbol is used for an ID selector in CSS?",
+        options: [
+          ".",
+          "#",
+          "*",
+          "@"
+        ],
+        answer: 1
+      }
+    ];
+
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+
+    const questionElement = document.getElementById("question");
+    const optionsElement = document.getElementById("options");
+    const nextButton = document.getElementById("nextBtn");
+    const progressElement = document.getElementById("progress");
+
+    const quizBox = document.getElementById("quizBox");
+    const resultBox = document.getElementById("resultBox");
+
+    const scoreElement = document.getElementById("score");
+    const restartButton = document.getElementById("restartBtn");
+
+
+    function loadQuestion() {
+
+      answered = false;
+
+      nextButton.classList.add("hidden");
+
+      const q = questions[currentQuestion];
+
+      progressElement.textContent =
+        `Question ${currentQuestion + 1} of ${questions.length}`;
+
+      questionElement.textContent = q.question;
+
+      optionsElement.innerHTML = "";
+
+      q.options.forEach((option, index) => {
+
+        const button = document.createElement("button");
+
+        button.textContent = option;
+
+        button.classList.add("option");
+
+        button.addEventListener("click", () => {
+          selectAnswer(index, button);
+        });
+
+        optionsElement.appendChild(button);
+
+      });
+    }
+
+
+    function selectAnswer(selectedIndex, selectedButton) {
+
+      if (answered) return;
+
+      answered = true;
+
+      const correctAnswer = questions[current
