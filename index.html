@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Quiz System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Online Quiz System</h1>
+    <p>Test your knowledge with an interactive quiz.</p>
+
+    <input type="text" id="studentName" placeholder="Enter your name">
+
+    <select id="category">
+        <option value="general">General Knowledge</option>
+        <option value="computer">Computer Science</option>
+    </select>
+
+    <button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<script>
+function startQuiz() {
+    const name = document.getElementById("studentName").value.trim();
+
+    if (!name) {
+        alert("Please enter your name.");
+        return;
+    }
+
+    localStorage.setItem("studentName", name);
+    localStorage.setItem(
+        "category",
+        document.getElementById("category").value
+    );
+
+    window.location.href = "quiz.html";
+}
+</script>
+
+</body>
+</html>
