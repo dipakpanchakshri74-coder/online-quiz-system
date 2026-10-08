@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Result</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="result-container">
+    <h1>Quiz Completed!</h1>
+
+    <h2 id="studentResult"></h2>
+
+    <p id="score"></p>
+    <p id="percentage"></p>
+
+    <button onclick="restartQuiz()">Restart Quiz</button>
+</div>
+
+<script>
+const name = localStorage.getItem("studentName");
+const score = Number(localStorage.getItem("score")) || 0;
+const total = Number(localStorage.getItem("totalQuestions")) || 0;
+
+document.getElementById("studentResult").innerText =
+    "Student: " + name;
+
+document.getElementById("score").innerText =
+    "Score: " + score + " / " + total;
+
+const percentage = total > 0 ? (score / total) * 100 : 0;
+
+document.getElementById("percentage").innerText =
+    "Percentage: " + percentage.toFixed(2) + "%";
+
+function restartQuiz() {
+    localStorage.removeItem("score");
+    localStorage.removeItem("totalQuestions");
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
