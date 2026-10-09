@@ -17,7 +17,7 @@ body {
 .container {
     width: 100%;
     max-width: 700px;
-    background: white;
+    background: rgb(2, 246, 254);
     padding: 30px;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -39,7 +39,7 @@ input,
 select {
     width: 100%;
     padding: 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #02fe45;
     border-radius: 8px;
     font-size: 16px;
 }
@@ -51,7 +51,7 @@ button {
     border: none;
     border-radius: 8px;
     background: #667eea;
-    color: white;
+    color: rgb(7, 0, 4);
     font-size: 16px;
     cursor: pointer;
 }
@@ -73,10 +73,18 @@ button:hover {
     border: 1px solid #ddd;
     border-radius: 8px;
     cursor: pointer;
+    text-align: left;
+    background: rgb(253, 253, 252);
 }
 
 .option:hover {
-    background: #f0f0f0;
+    background: #fd0000;
+}
+
+.option.selected {
+    background: #c6f107;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
 }
 
 .timer {
@@ -84,6 +92,17 @@ button:hover {
     font-weight: bold;
     color: #e63946;
     margin-bottom: 15px;
+}
+
+.navigation {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.navigation button {
+    flex: 1;
+    margin-top: 0;
 }
 
 #result {
