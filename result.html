@@ -3,44 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Result</title>
+    <meta name="theme-color" content="#f4f5ef">
+    <title>Your results | Quizroom</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="result-page">
+<header class="site-header">
+    <a class="brand" href="index.html" aria-label="Quizroom home">
+        <span class="brand-mark" aria-hidden="true">Q</span>
+        <span>quizroom</span>
+    </a>
+    <span class="header-note">Your effort, in full view.</span>
+</header>
 
-<div class="result-container">
-    <h1>Quiz Completed!</h1>
+<main class="result-layout">
+    <section class="result-hero" aria-labelledby="resultTitle">
+        <div class="result-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> QUIZ COMPLETE</p>
+            <h1 id="resultTitle">Nicely<br><span>done.</span></h1>
+            <p id="resultMessage" class="result-message"></p>
+            <p id="studentResult" class="result-student"></p>
+        </div>
+        <div class="score-display" id="scoreDisplay" role="img" aria-label="Your quiz score">
+            <div class="score-inner"><strong id="percentage">0%</strong><span>YOUR SCORE</span></div>
+        </div>
+    </section>
 
-    <h2 id="studentResult"></h2>
+    <section class="result-details" aria-label="Quiz results and answer review">
+        <div class="result-overview">
+            <div class="overview-heading"><div><span class="panel-kicker">YOUR RESULTS</span><h2 id="subjectResult">General knowledge</h2></div><span class="result-check" aria-hidden="true">&#10003;</span></div>
+            <div class="stat-row">
+                <div class="result-stat"><span>CORRECT</span><strong id="score">0 <small>/ 5</small></strong></div>
+                <div class="result-stat"><span>TIME TAKEN</span><strong id="timeTaken">00:00</strong></div>
+                <div class="result-stat"><span>ANSWERED</span><strong id="answeredResult">0 <small>/ 5</small></strong></div>
+            </div>
+            <div class="result-actions">
+                <button id="retryBtn" class="button-primary" type="button">Try this subject again <span aria-hidden="true">&#8594;</span></button>
+                <a class="button-text" href="index.html">Choose another subject <span aria-hidden="true">&#8599;</span></a>
+            </div>
+        </div>
 
-    <p id="score"></p>
-    <p id="percentage"></p>
+        <div class="review-section">
+            <div class="review-heading"><div><span class="panel-kicker">LEARN AS YOU GO</span><h2>Answer review</h2></div><span id="reviewCount" class="review-count">05 QUESTIONS</span></div>
+            <div id="answerReview" class="answer-review"></div>
+        </div>
+    </section>
+</main>
 
-    <button onclick="restartQuiz()">Restart Quiz</button>
-</div>
+<footer class="site-footer"><span>QUIZROOM</span><span>A good result is one you learn from.</span></footer>
 
+<script src="questions.js"></script>
 <script>
-const name = localStorage.getItem("studentName");
+const category = localStorage.getItem("category");
+const subject = subjects[category] || subjects.general;
+const savedAnswers = JSON.parse(localStorage.getItem("selectedAnswers") || "[]");
 const score = Number(localStorage.getItem("score")) || 0;
-const total = Number(localStorage.getItem("totalQuestions")) || 0;
+const total = subject.questions.length;
+const answered = savedAnswers.filter(answer => answer !== undefined).length;
+const percentage = total ? Math.round((score / total) * 100) : 0;
+const duration = Number(localStorage.getItem("quizDurationSeconds")) || 0;
+const resultMessages = percentage === 100
+    ? "A perfect round. You knew your stuff."
+    : percentage >= 80
+        ? "Excellent work. You have a strong grasp of this subject."
+        : percentage >= 60
+            ? "A solid effort. You're building a great foundation."
+            : "Every question is a chance to learn something new.";
 
-document.getElementById("studentResult").innerText =
-    "Student: " + name;
+document.getElementById("studentResult").textContent = "A round of applause for " + (localStorage.getItem("studentName") || "you");
+document.getElementById("resultMessage").textContent = resultMessages;
+document.getElementById("percentage").textContent = percentage + "%";
+document.getElementById("scoreDisplay").style.setProperty("--score-angle", percentage + "%");
+document.getElementById("scoreDisplay").setAttribute("aria-label", "Your score: " + percentage + " percent");
+document.getElementById("subjectResult").textContent = subject.name;
+document.getElementById("score").innerHTML = score + " <small>/ " + total + "</small>";
+document.getElementById("answeredResult").innerHTML = answered + " <small>/ " + total + "</small>";
+document.getElementById("reviewCount").textContent = String(total).padStart(2, "0") + " QUESTIONS";
 
-document.getElementById("score").innerText =
-    "Score: " + score + " / " + total;
+const minutes = Math.floor(duration / 60);
+const seconds = duration % 60;
+document.getElementById("timeTaken").textContent = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
 
-const percentage = total > 0 ? (score / total) * 100 : 0;
+const review = document.getElementById("answerReview");
+subject.questions.forEach((question, index) => {
+    const isAnswered = savedAnswers[index] !== undefined;
+    const isCorrect = savedAnswers[index] === question.answer;
+    const item = document.createElement("article");
+    const number = document.createElement("span");
+    const content = document.createElement("div");
+    const prompt = document.createElement("h3");
+    const answer = document.createElement("p");
+    const status = document.createElement("span");
 
-document.getElementById("percentage").innerText =
-    "Percentage: " + percentage.toFixed(2) + "%";
+    item.className = "review-item";
+    item.classList.add(isCorrect ? "review-correct" : "review-incorrect");
+    number.className = "review-number";
+    number.textContent = String(index + 1).padStart(2, "0");
+    content.className = "review-content";
+    prompt.textContent = question.question;
+    answer.className = "review-answer";
+    answer.textContent = isCorrect
+        ? "Your answer: " + savedAnswers[index]
+        : "Your answer: " + (isAnswered ? savedAnswers[index] : "Not answered") + " · Correct answer: " + question.answer;
+    status.className = "review-status";
+    status.textContent = isCorrect ? "Correct" : (isAnswered ? "Review" : "Skipped");
+    content.append(prompt, answer);
+    item.append(number, content, status);
+    review.appendChild(item);
+});
 
-function restartQuiz() {
-    localStorage.removeItem("score");
-    localStorage.removeItem("totalQuestions");
-    window.location.href = "index.html";
-}
+document.getElementById("retryBtn").addEventListener("click", function () {
+    localStorage.removeItem("selectedAnswers");
+    window.location.href = "quiz.html";
+});
 </script>
-
 </body>
 </html>
