@@ -1,123 +1,159 @@
 let currentQuestion = 0;
-let score = 0;
 let selectedAnswers = [];
-let timeLeft = 60;
+let timeLeft = 300;
 let timer;
+let isFinished = false;
 
 const category = localStorage.getItem("category");
-
-let questions =
-    category === "computer"
-        ? computerQuestions
-        : generalQuestions;
-
-document.getElementById("questionNumber").innerText =
-    "Question 1 of " + questions.length;
+const subject = subjects[category] || subjects.general;
+const questions = subject.questions;
+const optionLetters = ["A", "B", "C", "D"];
 
 function loadQuestion() {
-
-    const q = questions[currentQuestion];
-
-    document.getElementById("questionNumber").innerText =
-        "Question " + (currentQuestion + 1) +
-        " of " + questions.length;
-
-    document.getElementById("question").innerText =
-        q.question;
-
+    const question = questions[currentQuestion];
     const optionsDiv = document.getElementById("options");
-    optionsDiv.innerHTML = "";
 
-    q.options.forEach(option => {
+    document.getElementById("questionNumber").textContent =
+        "Question " + (currentQuestion + 1) + " of " + questions.length;
+    document.getElementById("questionTag").textContent =
+        "QUESTION " + String(currentQuestion + 1).padStart(2, "0");
+    document.getElementById("question").textContent = question.question;
+    optionsDiv.replaceChildren();
 
+    question.options.forEach((option, index) => {
         const button = document.createElement("button");
+        const letter = document.createElement("span");
+        const label = document.createElement("span");
 
-        button.innerText = option;
-        button.className = "option";
-
+        button.type = "button";
+        button.className = "option-button";
+        button.setAttribute("aria-pressed", String(selectedAnswers[currentQuestion] === option));
         if (selectedAnswers[currentQuestion] === option) {
             button.classList.add("selected");
         }
 
-        button.onclick = function () {
-
+        letter.className = "option-letter";
+        letter.setAttribute("aria-hidden", "true");
+        letter.textContent = optionLetters[index];
+        label.className = "option-label";
+        label.textContent = option;
+        button.append(letter, label);
+        button.addEventListener("click", function () {
             selectedAnswers[currentQuestion] = option;
-
-            document.querySelectorAll(".option")
-                .forEach(btn => btn.classList.remove("selected"));
-
-            button.classList.add("selected");
-        };
-
+            localStorage.setItem("selectedAnswers", JSON.stringify(selectedAnswers));
+            loadQuestion();
+        });
         optionsDiv.appendChild(button);
     });
 
-    document.getElementById("prevBtn").style.display =
-        currentQuestion === 0 ? "none" : "inline-block";
-
-    document.getElementById("nextBtn").innerText =
-        currentQuestion === questions.length - 1
-            ? "Submit Quiz"
-            : "Next";
+    document.getElementById("subjectName").textContent = subject.name.toUpperCase();
+    document.getElementById("prevBtn").disabled = currentQuestion === 0;
+    document.getElementById("nextBtn").innerHTML = currentQuestion === questions.length - 1
+        ? "Finish quiz <span aria-hidden=\"true\">&#8594;</span>"
+        : "Next question <span aria-hidden=\"true\">&#8594;</span>";
+    updateProgress();
+    renderQuestionGrid();
 }
 
-function nextQuestion() {
+function updateProgress() {
+    const answered = selectedAnswers.filter(answer => answer !== undefined).length;
+    const percent = Math.round((answered / questions.length) * 100);
+    const progressBar = document.getElementById("progressBar");
 
-    if (currentQuestion === questions.length - 1) {
-
-        calculateScore();
-        return;
-    }
-
-    currentQuestion++;
-    loadQuestion();
+    document.getElementById("answeredCount").textContent = answered;
+    document.getElementById("totalCount").textContent = questions.length;
+    document.getElementById("progressText").textContent = percent + "% complete";
+    document.getElementById("progressFill").style.width = percent + "%";
+    progressBar.setAttribute("aria-valuemax", questions.length);
+    progressBar.setAttribute("aria-valuenow", answered);
 }
 
-function previousQuestion() {
+function renderQuestionGrid() {
+    const grid = document.getElementById("questionGrid");
+    grid.replaceChildren();
 
-    if (currentQuestion > 0) {
-        currentQuestion--;
+    questions.forEach((question, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "question-jump";
+        button.textContent = index + 1;
+        button.setAttribute("aria-label", "Go to question " + (index + 1));
+        if (index === currentQuestion) {
+            button.classList.add("current");
+            button.setAttribute("aria-current", "step");
+        }
+        if (selectedAnswers[index] !== undefined) {
+            button.classList.add("answered");
+        }
+        button.addEventListener("click", function () {
+            currentQuestion = index;
+            loadQuestion();
+        });
+        grid.appendChild(button);
+    });
+}
+
+function moveQuestion(direction) {
+    const nextIndex = currentQuestion + direction;
+    if (nextIndex >= 0 && nextIndex < questions.length) {
+        currentQuestion = nextIndex;
         loadQuestion();
     }
 }
 
-function calculateScore() {
+function finishQuiz(skipConfirmation) {
+    if (isFinished) return;
 
-    score = 0;
+    const unanswered = questions.length - selectedAnswers.filter(answer => answer !== undefined).length;
+    if (!skipConfirmation && unanswered > 0) {
+        const message = unanswered + " question" + (unanswered === 1 ? " is" : "s are") + " unanswered. Finish anyway?";
+        if (!window.confirm(message)) return;
+    }
 
-    questions.forEach((q, index) => {
-
-        if (selectedAnswers[index] === q.answer) {
-            score++;
-        }
-    });
-
+    isFinished = true;
     clearInterval(timer);
+    const score = questions.reduce((total, question, index) =>
+        total + (selectedAnswers[index] === question.answer ? 1 : 0), 0);
 
     localStorage.setItem("score", score);
-    localStorage.setItem(
-        "totalQuestions",
-        questions.length
-    );
-
+    localStorage.setItem("totalQuestions", questions.length);
+    localStorage.setItem("selectedAnswers", JSON.stringify(selectedAnswers));
+    localStorage.setItem("quizDurationSeconds", 300 - timeLeft);
     window.location.href = "result.html";
 }
 
-function startTimer() {
+function updateTimer() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    const timerElement = document.getElementById("timer");
 
-    timer = setInterval(() => {
-
-        timeLeft--;
-
-        document.getElementById("timer").innerText =
-            "Time: " + timeLeft;
-
-        if (timeLeft <= 0) {
-            calculateScore();
-        }
-
-    }, 1000);
+    timerElement.textContent = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    timerElement.closest(".timer-box").classList.toggle("timer-warning", timeLeft <= 60);
+    if (timeLeft <= 0) finishQuiz(true);
 }
 
+document.getElementById("prevBtn").addEventListener("click", function () {
+    moveQuestion(-1);
+});
+document.getElementById("nextBtn").addEventListener("click", function () {
+    if (currentQuestion === questions.length - 1) {
+        finishQuiz(false);
+    } else {
+        moveQuestion(1);
+    }
+});
+document.getElementById("submitBtn").addEventListener("click", function () {
+    finishQuiz(false);
+});
+document.getElementById("exitQuiz").addEventListener("click", function (event) {
+    if (!window.confirm("Exit now? Your quiz progress will not be saved.")) {
+        event.preventDefault();
+    }
+});
+
+updateTimer();
 loadQuestion();
-startTimer();
+timer = setInterval(function () {
+    timeLeft--;
+    updateTimer();
+}, 1000);
