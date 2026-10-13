@@ -1,44 +1,78 @@
-<!DOCTYPE html>
+<html lang="en">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f5ef">
+    <title>Quizroom | Find out what you know</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <title>Online Quiz System</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<header class="site-header">
+    <a class="brand" href="index.html" aria-label="Quizroom home">
+        <span class="brand-mark" aria-hidden="true">Q</span>
+        <span>quizroom</span>
+    </a>
+    <span class="header-note">A little curiosity goes a long way.</span>
+</header>
 
-<div class="container">
-    <h1>Online Quiz System</h1>
-    <p>Test your knowledge with an interactive quiz.</p>
+<main class="home-layout">
+    <section class="home-intro" aria-labelledby="home-title">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> YOUR NEXT FIVE MINUTES</p>
+        <h1 id="home-title">Good questions.<br><span>Better thinking.</span></h1>
+        <p class="intro-copy">Take a quick, focused quiz and see what you know. Pick a subject, settle in, and give it your best shot.</p>
+        <div class="home-facts" aria-label="Quiz details">
+            <div><strong>05</strong><span>subjects</span></div>
+            <div><strong>05</strong><span>questions each</span></div>
+            <div><strong>05</strong><span>minutes</span></div>
+        </div>
+    </section>
 
-    <input type="text" id="studentName" placeholder="Enter your name">
+    <section class="start-panel" aria-labelledby="start-title">
+        <div class="panel-heading">
+            <span class="panel-kicker">READY WHEN YOU ARE</span>
+            <span class="panel-step">01 <span>/ 01</span></span>
+        </div>
+        <h2 id="start-title">Set up your quiz</h2>
+        <p class="panel-description">A name and a subject. That's all you need.</p>
+        <form id="startForm" class="start-form">
+            <label for="studentName">Your name</label>
+            <input type="text" id="studentName" name="studentName" placeholder="e.g. Alex Morgan" maxlength="50" autocomplete="name" required>
 
-    <select id="category">
-        <option value="general">General Knowledge</option>
-        <option value="computer">Computer Science</option>
-    </select>
+            <label for="category">Choose a subject</label>
+            <select id="category" name="category">
+                <option value="general">General knowledge</option>
+                <option value="computer">Computer science</option>
+                <option value="science">Science</option>
+                <option value="mathematics">Mathematics</option>
+                <option value="history">History</option>
+            </select>
 
-    <button onclick="startQuiz()">Start Quiz</button>
-</div>
+            <button class="button-primary start-button" type="submit">Start your quiz <span aria-hidden="true">&#8594;</span></button>
+        </form>
+        <p class="privacy-note"><span aria-hidden="true">&#9679;</span> Your progress stays on this device.</p>
+    </section>
+</main>
+
+<footer class="site-footer"><span>QUIZROOM</span><span>Made for curious minds</span></footer>
 
 <script>
-function startQuiz() {
+document.getElementById("startForm").addEventListener("submit", function (event) {
+    event.preventDefault();
     const name = document.getElementById("studentName").value.trim();
 
     if (!name) {
-        alert("Please enter your name.");
+        document.getElementById("studentName").focus();
         return;
     }
 
     localStorage.setItem("studentName", name);
-    localStorage.setItem(
-        "category",
-        document.getElementById("category").value
-    );
-
+    localStorage.setItem("category", document.getElementById("category").value);
+    localStorage.removeItem("selectedAnswers");
     window.location.href = "quiz.html";
-}
+});
 </script>
 
 </body>
