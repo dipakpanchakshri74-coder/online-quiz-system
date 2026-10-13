@@ -3,27 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Quiz</title>
+    <meta name="theme-color" content="#f4f5ef">
+    <title>Your quiz | Quizroom</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="quiz-page">
+<header class="site-header">
+    <a class="brand" href="index.html" aria-label="Quizroom home">
+        <span class="brand-mark" aria-hidden="true">Q</span>
+        <span>quizroom</span>
+    </a>
+    <a class="exit-link" href="index.html" id="exitQuiz">Exit quiz <span aria-hidden="true">&#8599;</span></a>
+</header>
 
-<div class="container">
-    <div id="timer" class="timer">Time: 60</div>
+<main class="quiz-layout">
+    <section class="quiz-main" aria-labelledby="quizTitle">
+        <div class="quiz-heading">
+            <div>
+                <p class="eyebrow"><span class="eyebrow-dot"></span> <span id="subjectName">GENERAL KNOWLEDGE</span></p>
+                <h1 id="quizTitle">Take your time.<br><span>Trust what you know.</span></h1>
+            </div>
+            <div class="timer-box" role="timer" aria-live="off">
+                <span class="timer-label">TIME LEFT</span>
+                <strong id="timer">05:00</strong>
+            </div>
+        </div>
 
-    <h1>Online Quiz</h1>
+        <div class="progress-block">
+            <div class="progress-copy"><span id="questionNumber">Question 1 of 5</span><span id="progressText">0% complete</span></div>
+            <div class="progress-track" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" id="progressBar"><span id="progressFill"></span></div>
+        </div>
 
-    <p id="questionNumber"></p>
+        <article class="question-panel">
+            <div class="question-meta"><span id="questionTag">QUESTION 01</span><span>CHOOSE ONE ANSWER</span></div>
+            <h2 id="question" aria-live="polite"></h2>
+            <div id="options" class="options-list" role="group" aria-label="Answer choices"></div>
+        </article>
 
-    <div id="question" class="question"></div>
+        <div class="quiz-navigation">
+            <button id="prevBtn" class="button-secondary" type="button"><span aria-hidden="true">&#8592;</span> Previous</button>
+            <button id="nextBtn" class="button-primary" type="button">Next question <span aria-hidden="true">&#8594;</span></button>
+        </div>
+    </section>
 
-    <div id="options"></div>
+    <aside class="quiz-sidebar" aria-label="Quiz overview">
+        <div class="sidebar-heading"><div><span class="panel-kicker">YOUR SESSION</span><h2>Looking good.</h2></div><span class="session-icon" aria-hidden="true">&#10003;</span></div>
+        <div class="answer-summary"><strong id="answeredCount">0</strong><span>of <span id="totalCount">5</span> answered</span></div>
+        <p class="navigator-label">QUESTION NAVIGATOR</p>
+        <div id="questionGrid" class="question-grid" aria-label="Jump to question"></div>
+        <p class="navigator-hint"><span class="legend-dot answered-dot"></span> Answered <span class="legend-dot current-dot"></span> Current</p>
+        <div class="sidebar-bottom">
+            <p>You can move between questions at any time. Unanswered questions count as incorrect.</p>
+            <button id="submitBtn" class="button-submit" type="button">Finish quiz <span aria-hidden="true">&#8594;</span></button>
+        </div>
+    </aside>
+</main>
 
-    <div class="navigation">
-        <button id="prevBtn" type="button">Previous</button>
-        <button id="nextBtn" type="button">Next</button>
-    </div>
-</div>
+<footer class="site-footer"><span>QUIZROOM</span><span>One question at a time.</span></footer>
 
 <script src="questions.js"></script>
 <script src="script.js"></script>
